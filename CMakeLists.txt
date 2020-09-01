@@ -10,9 +10,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(3rdparty/drogon)
 
-add_executable(covidwebhook main.cpp)
+add_executable(covidwebhook
+    main.cpp
+    controller/requesthandler.cpp
+    controller/requesthandler.hpp
+)
 
 target_link_libraries(${PROJECT_NAME}
-        ${CMAKE_CURR}
+        PRIVATE
         drogon
         )
