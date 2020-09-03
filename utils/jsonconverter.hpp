@@ -4,6 +4,7 @@
 #include <string_view>
 #include <json/json.h>
 #include <memory>
+#include <fstream>
 
 namespace bangkong {
 class JsonConverter
@@ -15,10 +16,20 @@ public:
         m_body = body;
         return *this;
     }
-    JsonConverter& build_json() noexcept {
+    JsonConverter& build_json_from_string() noexcept {
         Json::CharReaderBuilder builder;
         const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
         reader->parse(m_body.data(), m_body.data() + m_body.length(), &root, &error);
+        return *this;
+    }
+
+    JsonConverter& build_json_from_file() noexcept {
+        std::ifstream ifs;
+        ifs.open(m_body.data());
+
+        Json::CharReaderBuilder builder;
+        builder["collectComments"] = true;
+        Json::parseFromStream(builder, ifs, &root, &error);
         return *this;
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.2, 2020-09-01T10:40:52. -->
+<!-- Written by QtCreator 4.11.2, 2020-09-02T22:58:20. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -327,7 +327,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/private/var/folders/g6/n2jn6f1d5bb1ng503fx_60_00000gn/T/QtCreator-ddRGSP/qtc-cmake-OKeXXdFY</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/abumuhammad/Documents/C++/build-covidwebhook-Qt_5_14_0_clang_64-Debug</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.1">
     <value type="QString" key="Analyzer.Perf.CallgraphMode">dwarf</value>
@@ -403,7 +403,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/private/var/folders/g6/n2jn6f1d5bb1ng503fx_60_00000gn/T/QtCreator-ddRGSP/qtc-cmake-OKeXXdFY/3rdparty/drogon/drogon_ctl</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/abumuhammad/Documents/C++/build-covidwebhook-Qt_5_14_0_clang_64-Debug/3rdparty/drogon/drogon_ctl</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.2">
     <value type="QString" key="Analyzer.Perf.CallgraphMode">dwarf</value>
@@ -631,7 +631,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/private/var/folders/g6/n2jn6f1d5bb1ng503fx_60_00000gn/T/QtCreator-ddRGSP/qtc-cmake-OKeXXdFY/3rdparty/drogon/drogon_ctl</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/abumuhammad/Documents/C++/build-covidwebhook-Qt_5_14_0_clang_64-Debug/3rdparty/drogon/drogon_ctl</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.5">
     <value type="QString" key="Analyzer.Perf.CallgraphMode">dwarf</value>

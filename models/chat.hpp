@@ -12,6 +12,7 @@ public:
     virtual long long get_id() const = 0;
     virtual std::string get_command() const = 0;
     virtual std::string get_type() const = 0;
+    virtual std::string get_data() const = 0;
 };
 
 
@@ -38,6 +39,10 @@ public:
         return m_type;
     }
 
+    std::string get_data() const override {
+        return m_data;
+    }
+
     void set_first_name(const std::string& first_name) {
         m_first_name = first_name;
     }
@@ -54,12 +59,17 @@ public:
         m_type = type;
     }
 
+    void set_data(const std::string& data) {
+        m_data = data;
+    }
+
     Chat(const Chat& other) {
         m_id = other.m_id;
         m_first_name = other.m_first_name;
         m_last_name = other.m_last_name;
         m_command = other.m_command;
         m_type = other.m_type;
+        m_data = other.m_data;
     }
     Chat& operator=(const Chat& other) {
         m_id = other.m_id;
@@ -67,7 +77,7 @@ public:
         m_last_name = other.m_last_name;
         m_command = other.m_command;
         m_type = other.m_type;
-
+        m_data = other.m_data;
         return *this;
     }
 
@@ -77,6 +87,7 @@ public:
         m_last_name = std::move(other.m_last_name);
         m_command = std::move(other.m_command);
         m_type = std::move(other.m_type);
+        m_data = std::move(other.m_data);
     }
 
     Chat& operator=(Chat&& other) {
@@ -85,6 +96,7 @@ public:
         m_last_name = std::move(other.m_last_name);
         m_command = std::move(other.m_command);
         m_type = std::move(other.m_type);
+        m_data = std::move(other.m_data);
         return *this;
     }
 
@@ -94,6 +106,7 @@ private:
     std::string m_last_name;
     std::string m_command;
     std::string m_type;
+    std::string m_data;
 };
 }
 
