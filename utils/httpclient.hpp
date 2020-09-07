@@ -3,16 +3,12 @@
 
 #include <functional>
 #include <string_view>
-#include <cpp_redis/cpp_redis>
-#include <cpprest/asyncrt_utils.h>
-#include <cpprest/json.h>
 #include <json/json.h>
 #include <optional>
+#include <easyhttpcpp/EasyHttp.h>
+#include <Poco/Redis/Client.h>
 
 namespace bangkong {
-
-using MessageWithButton = std::function<void(std::string_view, std::optional<Json::Value>)>;
-using MessageOnly = std::function<void(std::string_view)>;
 
 enum TypeArticle {
     NASEHAT = 0,
@@ -25,39 +21,52 @@ enum TypeArticle {
 class AbsHttpClient {
 public:
     virtual ~AbsHttpClient() {};
-    virtual void get_data_total(MessageOnly&&) = 0;
-    virtual void get_data_nations(MessageOnly&&) = 0;
-    virtual void req_nation(MessageOnly&&, std::string_view) = 0;
-    virtual void get_data_national(MessageWithButton&&) = 0;
-    virtual void get_all_province(MessageWithButton&&) = 0;
-    virtual void get_all_hospital(MessageWithButton&&) = 0;
-    virtual void get_hospital(MessageOnly&&, std::string_view) = 0;
-    virtual void get_hoaxs(MessageOnly&&) = 0;
-    virtual void get_article(MessageOnly&&, bangkong::TypeArticle) = 0;
-    virtual void get_ciamis(MessageOnly&&) = 0;
+    virtual void post_message_only(Json::Value&&) = 0;
+    virtual void send_data_total(Json::Value&&) = 0;
+    virtual void send_data_nations(Json::Value&&) = 0;
+    virtual void send_nation(Json::Value&&, std::string_view) = 0;
+    virtual void send_data_national(Json::Value&&) = 0;
+    virtual void send_all_province(Json::Value&&) = 0;
+    virtual void send_province(Json::Value&&) = 0;
+    virtual void send_all_hospital(Json::Value&&) = 0;
+    virtual void send_hospital(Json::Value&&, std::string_view) = 0;
+    virtual void send_hoaxs(Json::Value&&) = 0;
+    virtual void send_article(Json::Value&&, bangkong::TypeArticle) = 0;
+    virtual void send_ciamis(Json::Value&&) = 0;
 };
 
 class HttpClient: AbsHttpClient
 {
 public:
-    HttpClient();
-    ~HttpClient() {}
-    void get_data_total(std::function<void (std::string_view)> &&) override;
-    void get_data_nations(std::function<void (std::string_view)> &&) override;
-    void req_nation(std::function<void (std::string_view)> &&, std::string_view) override;
-    void get_data_national(std::function<void (std::string_view, std::optional<Json::Value>)> &&) override;
-    void get_all_province(std::function<void (std::string_view, std::optional<Json::Value>)> &&) override;
-    void get_all_hospital(MessageWithButton &&) override;
-    void get_hospital(MessageOnly &&, std::string_view prov) override;
-    void get_hoaxs(MessageOnly &&) override;
-    void get_article(MessageOnly&&, bangkong::TypeArticle) override;
-    void get_ciamis(MessageOnly&&) override;
+    HttpClient()  {
+        p_http_client = easyhttpcpp::EasyHttp::Builder().build();
+    }
+    ~HttpClient() {
+        if (p_http_client.get() == nullptr) {
+            p_http_client.reset(nullptr);
+        }
+    }
+    void post_message_only(Json::Value &&) override;
+    void send_data_total(Json::Value&&) override;
+    void send_data_nations(Json::Value&&) override;
+    void send_nation(Json::Value&&, std::string_view) override;
+    void send_data_national(Json::Value&&) override;
+    void send_all_province(Json::Value&&) override;
+    void send_province(Json::Value&&) override;
+    void send_all_hospital(Json::Value&&) override;
+    void send_hospital(Json::Value&&, std::string_view) override;
+    void send_hoaxs(Json::Value&&) override;
+    void send_article(Json::Value&&, bangkong::TypeArticle) override;
+    void send_ciamis(Json::Value&&) override;
 private:
-    pplx::task<std::vector<unsigned char>> get_timestamp();
-    pplx::task<std::vector<unsigned char>> get_hoaxs();
-    void build_and_parse_message(web::json::value &&json_obj, std::string &result);
+    uint64_t get_timestamp();
+    std::string build_and_parse_message(Json::Value&&json_obj);
+    easyhttpcpp::Call::Ptr call_get_request(std::string_view);
+    void set_redis_key(const std::string& key, std::string&& value);
+    std::string get_redis_key(const std::string& key);
+    bool redis_auth(Poco::Redis::Client& client, const std::string& usr, const std::string& pass);
 private:
-    cpp_redis::client redis_client;
+    easyhttpcpp::EasyHttp::Ptr p_http_client;
 };
 }
 

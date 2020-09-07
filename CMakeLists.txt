@@ -7,13 +7,23 @@ project(covidwebhook LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS *)
 
-find_package(cpprestsdk REQUIRED)
-find_package(fmt REQUIRED)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules/)
+
 find_package(OpenSSL REQUIRED)
-find_package(Boost COMPONENTS system date_time REQUIRED)
+find_package(Poco REQUIRED Foundation Data DataSQLite Net NetSSL Redis Crypto CONFIG)
+find_package(easyhttpcpp REQUIRED CONFIG)
+find_package(fmt REQUIRED)
+find_package(Boost COMPONENTS system date_time thread fiber REQUIRED)
 
-add_subdirectory(3rdparty/drogon)
+find_package(jsoncpp REQUIRED)
+list(APPEND INCLUDE_DIRS_FOR_DYNAMIC_VIEW ${JSONCPP_INCLUDE_DIRS})
+
+set(DATE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/3rdparty/date/include)
+
+#find_library(cpprestsdk-lib cpprest)
+#message(STATUS "cpprestsdk-lib = ${cpprestsdk-lib}")
 
 
 add_executable(covidwebhook
@@ -31,18 +41,28 @@ add_executable(covidwebhook
     utils/money.h
     utils/httpclient.cpp
     utils/httpclient.hpp
-    data/countries.json
     models/article_model.hpp
-)
+    utils/utils.hpp
+    commander/httpclientcallback.hpp
+    commander/redirectmessage.cpp
+    commander/redirectmessage.hpp
+    )
+
+target_include_directories(covidwebhook
+        PUBLIC
+        ${DATE_INCLUDE_DIRS}
+        )
 
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE
-        drogon
         PUBLIC
-        /usr/local/lib/libcpp_redis.a
-        /usr/local/lib/libtacopie.a
+        Jsoncpp_lib
         fmt::fmt
-        cpprestsdk::cpprest
+        easyhttpcpp::easyhttp
+        Poco::Foundation
+        Poco::Data Poco::DataSQLite
+        Poco::Net Poco::NetSSL Poco::Crypto
+        OpenSSL::SSL OpenSSL::Crypto
+        Poco::Redis
         ${OPENSSL_LIBRARIES}
         ${Boost_LIBRARIES}
         )

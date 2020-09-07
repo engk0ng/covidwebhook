@@ -9,7 +9,7 @@ class AbsMessage {
 public:
     virtual ~AbsMessage() {}
     virtual std::string get_full_name() noexcept = 0;
-    virtual long long get_id() const = 0;
+    virtual uint64_t get_id() = 0;
     virtual std::string get_command() const = 0;
     virtual std::string get_type() const = 0;
     virtual std::string get_data() const = 0;
@@ -27,7 +27,7 @@ public:
         m_id = id;
     }
 
-    long long get_id() const override {
+    uint64_t get_id() override {
         return m_id;
     }
 
@@ -101,7 +101,7 @@ public:
     }
 
 private:
-    long long m_id;
+    uint64_t m_id;
     std::string m_first_name;
     std::string m_last_name;
     std::string m_command;

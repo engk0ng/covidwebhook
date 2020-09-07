@@ -6,10 +6,9 @@
 #include "../models/chat.hpp"
 #include "../commander/sender.hpp"
 
-void RequestHandler::update(const drogon::HttpRequestPtr &req,
-                            std::function<void (const drogon::HttpResponsePtr &)> &&callback) const {
+void RequestHandler::update(const crow::request& req) {
     //std::cout << req->getBody() << std::endl;
-    std::pair<Json::Value, JSONCPP_STRING> data = bangkong::JsonConverter(req->getBody())
+    std::pair<Json::Value, JSONCPP_STRING> data = bangkong::JsonConverter(req.body)
             .build_json_from_string()
             .data_json();
 
@@ -18,10 +17,6 @@ void RequestHandler::update(const drogon::HttpRequestPtr &req,
         bangkong::Chat chat = get_chat(std::move(root));
         bangkong::Sender(&chat).sendMessage();
     }
-
-    auto resp = drogon::HttpResponse::newHttpResponse();
-    resp->setBody("");
-    callback(resp);
 }
 
 bangkong::Chat RequestHandler::get_chat(Json::Value&& root) const noexcept {
