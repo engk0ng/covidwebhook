@@ -26,7 +26,7 @@ void Message::build_for_menu() noexcept {
                             "2. Per negara /internasional\n"
                             "3. Secara nasional /nasional\n"
                             "4. Ciamis /ciamis\n\n"
-                            "Rumah sakit rujukan Covid-19 di Indonesia: /rs\n\n"
+                            "Menampilkan Rumah Sakit rujukan Covid-19 di Indonesia: /rs\n\n"
                             "Menampilkan artikel\n"
                             "1. Artikel islam /artikel_islami\n"
                             "2. Nasehat /nasehat\n\n"
