@@ -99,7 +99,7 @@ void Message::build_for_province(std::vector<std::string>&& vec) noexcept {
                                    "Positif Aktif: {} orang\n"
                                    "Sembuh: {} orang\n"
                                    "Meninggal: {} orang\n</pre>\n\n{}",
-                                   vec.at(0), vec.at(1), vec.at(2), vec.at(3), vec.at(4),
+                                   vec.at(0), vec.at(1), vec.at(4), vec.at(2), vec.at(3),
                                    "<b>Jangan lupa PAKAI MASKER dan jalankan protokol kesehatan!</b>");
     m_message_json["text"] = prov;
     m_http_client->send_province(std::move(m_message_json));

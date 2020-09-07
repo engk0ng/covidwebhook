@@ -1,4 +1,4 @@
-FROM covidwebhook:1.0
+FROM covidwebhook:1.0.2
 
 WORKDIR /usr/src/khobar_webhook/covidwebhook/build
 CMD ["./covidwebhook"]

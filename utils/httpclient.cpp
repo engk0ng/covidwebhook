@@ -226,7 +226,7 @@ void HttpClient::send_data_nations(Json::Value&& messages) {
         if (pair.second == "") {
             auto array = pair.first["countries"];
             std::string country_str = "<b>Daftar Negara</b>\n\n"
-                                      "Click link yang berada di sebelah <strong>nama negara</strong> untuk menampilkan data.\n\n";
+                                      "Klik link yang berada di sebelah <strong>nama negara</strong> untuk menampilkan data.\n\n";
             Json::Value::const_iterator it;
             int i = 1;
             for(it = array.begin(); it != array.end(); ++it) {
