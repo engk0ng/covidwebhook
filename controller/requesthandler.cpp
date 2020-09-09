@@ -7,7 +7,6 @@
 #include "../commander/sender.hpp"
 
 void RequestHandler::update(const crow::request& req) {
-    //std::cout << req->getBody() << std::endl;
     std::pair<Json::Value, JSONCPP_STRING> data = bangkong::JsonConverter(req.body)
             .build_json_from_string()
             .data_json();

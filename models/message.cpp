@@ -136,6 +136,12 @@ void Message::build_for_ciamis() noexcept {
     return;
 }
 
+void Message::build_covid_for_province(std::string_view prov, const Json::Value& json_prov) noexcept {
+    parse_html().build_message();
+    m_http_client->send_covid_privince(std::move(m_message_json), prov, json_prov);
+    return;
+}
+
 Message& Message::parse_html() noexcept {
     m_mode = "html";
     return *this;

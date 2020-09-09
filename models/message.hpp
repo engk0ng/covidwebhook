@@ -40,6 +40,7 @@ public:
     void build_for_article(bangkong::TypeArticle) noexcept;
     void build_for_credit() noexcept;
     void build_for_ciamis() noexcept;
+    void build_covid_for_province(std::string_view, const Json::Value&) noexcept;
     Message& parse_html() noexcept;
     Message& parse_markdown() noexcept;
     void build_message() noexcept;

@@ -1,6 +1,7 @@
 #ifndef SENDER_HPP
 #define SENDER_HPP
 
+#include <vector>
 #include "../models/chat.hpp"
 
 namespace bangkong {
@@ -16,6 +17,7 @@ public:
 private:
     bangkong::AbsMessage* m_chat;
     bool m_status_send;
+    std::vector<std::string> m_commands;
 };
 }
 

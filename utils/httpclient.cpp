@@ -58,6 +58,11 @@ namespace bangkong {
 static const std::string PROV_KEY = "__provinsi__";
 static const std::string RS_KEY = "__rs__";
 static const std::string COUNTRY_KEY = "___country____";
+static const std::string_view blank = "<b>Tidak dapat menampilkan data.</b>/menu";
+
+static std::string message_blank() {
+    return fmt::format("{}\n{}", hint_message, blank);
+}
 
 static std::string months[12]{"Januari", "Februari", "Maret", "April",
 "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
@@ -193,7 +198,7 @@ void HttpClient::send_data_total(Json::Value &&messages) {
                                            "Sembuh: {} orang\n"
                                            "Meninggal: {} orang\n</pre>\n\n"
                                            "{}\n"
-                                           "Update terakhir:\n<b>{}</b>",
+                                           "Update terakhir:\n<b>{}</b> /menu",
                                            konfirm_str,
                                            aktif_str,
                                            sembuh_str,
@@ -203,7 +208,7 @@ void HttpClient::send_data_total(Json::Value &&messages) {
             result = text;
         }
         else {
-            result = "<b>Tidak dapat menampilkan data</b>";
+            result = message_blank();
         }
 
         messages["text"] = result;
@@ -242,9 +247,10 @@ void HttpClient::send_data_nations(Json::Value&& messages) {
                 ++i;
             }
             result = std::move(country_str);
+            result.append("\n\n/menu");
         }
         else {
-            result = "<b>Tidak dapat menampilkan data</b>";
+            result = message_blank();
         }
         messages["text"] = result;
         RedirectMessage(std::move(messages)).send_data();
@@ -288,7 +294,7 @@ void HttpClient::send_nation(Json::Value&& messages, std::string_view code) {
                                                "Sembuh: {} orang\n"
                                                "Meninggal: {} orang\n</pre>\n\n"
                                                "{}\n"
-                                               "Update terakhir:\n<b>{}</b>",
+                                               "Update terakhir:\n<b>{}</b> /menu",
                                                *name,
                                                konfirm_str,
                                                aktif_str,
@@ -299,7 +305,7 @@ void HttpClient::send_nation(Json::Value&& messages, std::string_view code) {
                 messages["text"] = text;
             }
             else {
-                messages["text"] = "<b>Data tidak dapat ditampilkan</b>";
+                messages["text"] = message_blank();
             }
             RedirectMessage(std::move(messages)).send_data();
         };
@@ -308,7 +314,7 @@ void HttpClient::send_nation(Json::Value&& messages, std::string_view code) {
         p_cb->waitForCompletion();
     }
     else {
-        messages["text"] = "<b>Data tidak ditemukan</b>";
+        messages["text"] = "<b>Data tidak ditemukan.</b>/menu";
         RedirectMessage(std::move(messages)).send_data();
     }
 }
@@ -352,7 +358,7 @@ void HttpClient::send_data_national(Json::Value&& messages) {
                                            "Sembuh: {} orang\n"
                                            "Meninggal: {} orang\n</pre>\n\n"
                                            "{}\n"
-                                           "Update terakhir:\n<b>{}</b>",
+                                           "Update terakhir:\n<b>{}</b> /menu",
                                            negara, konfirm_str,
                                            aktif_str, sembuh_str,
                                            meninggal_str,
@@ -381,7 +387,7 @@ void HttpClient::send_all_province(Json::Value &&messages) {
 
         if (pair.second == "") {
             auto json_obj = pair.first;
-            std::string list = "<b>Data Covid19 Per Provinsi (Klik nama provinsi untuk menampilkan data!): </b>\n\n";
+            std::string list = "<b>Pilih nama provinsi yang ingin anda lihat</b> /menu\n\n";
             int i = 0;
             Json::Value::const_iterator it;
             Json::Value regions = json_obj["regions"];
@@ -419,12 +425,64 @@ void HttpClient::send_all_province(Json::Value &&messages) {
                 ++i;
             }
 
-            base["inline_keyboard"] = array;
+            base["keyboard"] = array;
+            base["resize_keyboard"] = true;
+            base["one_time_keyboard"] = true;
             messages["text"] = list;
             messages["reply_markup"] = base.toStyledString();
         }
         else {
-            messages["text"] = "<b>Data tidak dapat ditampilkan</b>";
+            messages["text"] = message_blank();
+        }
+        RedirectMessage(std::move(messages)).send_data();
+    };
+    HttpClientCallback::Ptr p_cb = new HttpClientCallback(std::move(p_send));
+    p_call->executeAsync(p_cb);
+    p_cb->waitForCompletion();
+}
+
+void HttpClient::send_covid_privince(Json::Value &&messages, std::string_view prov, const Json::Value& json_prov) {
+    uint64_t timestamp = get_timestamp();
+    easyhttpcpp::Call::Ptr p_call = call_get_request(nasional_url);
+    MessageOnly p_send = [&messages, prov, timestamp, &json_prov](std::string&& res) {
+        std::pair<Json::Value, JSONCPP_STRING> pair = JsonConverter()
+                .set_body(res)
+                .build_json_from_string()
+                .data_json();
+
+        if (pair.second == "") {
+            auto json_obj = pair.first;
+            Json::Value::const_iterator it;
+            Json::Value regions = json_obj["regions"];
+            Json::Value base;
+            Json::Value array(Json::arrayValue);
+            std::string result = "";
+            for (it = regions.begin(); it != regions.end(); ++it) {
+                if ((*it)["name"] == std::string(prov.data())) {
+                    int64_t terkonfirmasi = (*it)["numbers"]["infected"].asInt64();
+                    int64_t sembuh = (*it)["numbers"]["recovered"].asInt64();
+                    int64_t meninggal = (*it)["numbers"]["fatal"].asInt64();
+                    int64_t aktif = terkonfirmasi - (sembuh + meninggal);
+
+                    std::string konfirm_str = Money::getInstance().toMoneyFormat(std::to_string(terkonfirmasi), ".", "");
+                    std::string sembuh_str = Money::getInstance().toMoneyFormat(std::to_string(sembuh), ".", "");
+                    std::string meninggal_str = Money::getInstance().toMoneyFormat(std::to_string(meninggal), ".", "");
+                    std::string aktif_str = Money::getInstance().toMoneyFormat(std::to_string(aktif), ".", "");
+
+                    result = fmt::format("<b>Provinsi {} </b>:\n<pre>"
+                                                   "Terkonfirmasi: {} orang\n"
+                                                   "Positif Aktif: {} orang\n"
+                                                   "Sembuh: {} orang\n"
+                                                   "Meninggal: {} orang\n</pre>\nLihat detailnya di {}\n\n{}\nUpdate terakhir:\n<b>{}</b> /menu",
+                                                   prov, konfirm_str, aktif_str, sembuh_str, meninggal_str, json_prov["website"].asString(),
+                                                   "<b>Jangan lupa PAKAI MASKER dan jalankan protokol kesehatan!</b>", bangkong::datetime_from_timestamp(timestamp));
+                    break;
+                }
+            }
+            messages["text"] = result;
+        }
+        else {
+            messages["text"] = message_blank();
         }
         RedirectMessage(std::move(messages)).send_data();
     };
@@ -459,7 +517,7 @@ void HttpClient::send_all_hospital(Json::Value &&messages) {
 
             BOOST_FOREACH(const std::string& item, data) {
                 Json::Value btn_one;
-                btn_one["text"] = item;
+                btn_one["text"] = fmt::format("RS di {}", item);
                 btn_one["callback_data"] = item;
                 Json::Value array1(Json::arrayValue);
                 array1[0] = btn_one;
@@ -467,13 +525,16 @@ void HttpClient::send_all_hospital(Json::Value &&messages) {
                 ++i;
             }
 
-            base["inline_keyboard"] = array;
+            base["keyboard"] = array;
+            base["resize_keyboard"] = true;
+            base["one_time_keyboard"] = true;
+            base["selective"] = true;
             data.clear();
-            messages["text"] = "<b>Rumah sakit rujukan per provinsi (Klik nama provinsi untuk menampilkan data!)</b>\n\n";
+            messages["text"] = "<b>Pilih provinsi yang ingin anda lihat</b> /menu\n\n";
             messages["reply_markup"] = base.toStyledString();
         }
         else {
-            messages["text"]= "<b>Data tidak dapat ditampilkan</b>";
+            messages["text"]= message_blank();
         }
         RedirectMessage(std::move(messages)).send_data();
     };
@@ -511,7 +572,7 @@ void HttpClient::send_hospital(Json::Value &&messages, std::string_view prov) {
                     result.append("\n");
                 }
             }
-            std::string rs = fmt::format("<b>Berikut Rumah Sakit Rujukan Covid-19 di {}</b>\n\n{}\n\n{}", prov, result, hint_message);
+            std::string rs = fmt::format("<b>Berikut Rumah Sakit Rujukan Covid-19 di {}</b>\n\n{}\n\n{} /menu", prov, result, hint_message);
             messages["text"] = rs;
         }
         else {
@@ -546,11 +607,11 @@ void HttpClient::send_hoaxs(Json::Value &&messages) {
             }
             std::string hoaxs = fmt::format("<b>Awas berita hoaks</b>\n\n"
                                             "<pre>Klik judulnya lihat faktanya</pre>\n\n "
-                                            "{}", result);
+                                            "{}\n\n/menu", result);
             messages["text"] = hoaxs;
         }
         else {
-            messages["text"] = "<b>Data tidak dapat ditampilkan</b>";
+            messages["text"] = message_blank();
         }
         RedirectMessage(std::move(messages)).send_data();
     };
@@ -663,7 +724,7 @@ void HttpClient::send_ciamis(Json::Value &&messages) {
                 url.append("\">");
                 url.append("https://pikcovid19.ciamiskab.go.id/");
                 url.append("</a>");
-                std::string result = fmt::format("<b>{}</b>\n\n<i>{}</i>\n\n{}\n\n{}\n\n{}\n\n{}\n\n{}\n\n{}{}",
+                std::string result = fmt::format("<b>{}</b>\n\n<i>{}</i>\n\n{}\n\n{}\n\n{}\n\n{}\n\n{}\n\n{}{} /menu",
                                                  header,
                                                  tgl,
                                                  konfirmasi,
@@ -676,11 +737,11 @@ void HttpClient::send_ciamis(Json::Value &&messages) {
                 messages["text"] = result;
             }
             else {
-                messages["text"] = "<b>Data tidak dapat ditampilkan</b>";
+                messages["text"] = message_blank();
             }
         }
         else {
-            messages["text"] = "<b>Data tidak dapat ditampilkan</b>";
+            messages["text"] = message_blank();
         }
         RedirectMessage(std::move(messages)).send_data();
     };
@@ -717,7 +778,7 @@ std::string HttpClient::build_and_parse_message(Json::Value &&json_obj) {
     }
     else {
         result.clear();
-        result = "<b>Data tidak dapat ditampilkan</b>";
+        result = message_blank();
     }
     return result;
 }

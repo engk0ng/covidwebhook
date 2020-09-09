@@ -33,6 +33,7 @@ public:
     virtual void send_hoaxs(Json::Value&&) = 0;
     virtual void send_article(Json::Value&&, bangkong::TypeArticle) = 0;
     virtual void send_ciamis(Json::Value&&) = 0;
+    virtual void send_covid_privince(Json::Value&&, std::string_view, const Json::Value&) = 0;
 };
 
 class HttpClient: AbsHttpClient
@@ -58,6 +59,7 @@ public:
     void send_hoaxs(Json::Value&&) override;
     void send_article(Json::Value&&, bangkong::TypeArticle) override;
     void send_ciamis(Json::Value&&) override;
+    void send_covid_privince(Json::Value &&, std::string_view, const Json::Value&) override;
 private:
     uint64_t get_timestamp();
     std::string build_and_parse_message(Json::Value&&json_obj);
